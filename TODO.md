@@ -1,9 +1,11 @@
 # TODO / Roadmap — Qualia Anatomy
 
-High Priority:
-- Agent Profile (Age + Biological Sex: Male/Female)
-- Pathology lab input + interpretation
-- Ontology manager with .q42 conversion
-- QualiaDB WASM checker
+## High Priority
+- Interactive BioStatus checklist
+- Agent Profile (Age + Male/Female)
+- Pathology lab interpretation
+- Ontology manager + .q42 conversion
+- Full WASM integration
 
-See full details in the file.
+## In Progress
+See index.html for current features.
