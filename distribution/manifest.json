@@ -7,6 +7,28 @@
   "container": "containers/human-welfare.hmc",
   "members": "members/",
   "sha256": "b26c952c13a0adb8937c5a8358baf6ab90aa3ddc53b24dbfb9ab0850d56fce47",
+  "atlas": {
+    "quality": "master",
+    "source": "master/production/human_atlas.vibe",
+    "producer": "synth files/1",
+    "container": "containers/anatomy-atlas.hmc",
+    "sha256": "cafb5c0314b9d62eb0a3e27b5ba4942024fb3baf60769f81d89135d2fe8c770b",
+    "members": "members/atlas-master/",
+    "licence": "CC-BY-4.0",
+    "bodies": [
+      {"id": "male", "organs_packed": 26, "hmc": "members/atlas-master/male.hmc", "fit": "members/atlas-master/male.fit.json", "constitution": "members/atlas-master/male.constitution.json", "report": "members/atlas-master/male.json"},
+      {"id": "female", "organs_packed": 33, "hmc": "members/atlas-master/female.hmc", "fit": "members/atlas-master/female.fit.json", "constitution": "members/atlas-master/female.constitution.json", "report": "members/atlas-master/female.json"}
+    ]
+  },
+  "authored": {
+    "source": "master/production/human_authored.vibe",
+    "producer": "synth files/1",
+    "container": "containers/anatomy-authored.hmc",
+    "sha256": "5227580e2d3445a7f53bd84a6091bfc1217ac610a50b4ee74a825d98998cb4c5",
+    "members": "members/authored/",
+    "outputs": 79,
+    "note": "Synth generated each named part. No third-party mesh was fetched."
+  },
   "bundle_key_prefix": "outputs/",
   "presentation": "QualiaPortal WASM load_hmc_mesh, or a native host that reads the same HMC",
   "profiles": [

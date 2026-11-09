@@ -1,0 +1,4 @@
+# Third-party reference packs are over GitHub's file limit and are not the authored atlas.
+distribution/containers/anatomy-atlas.hmc
+distribution/containers/*.poet-source.lock
+distribution/members/atlas-master/
