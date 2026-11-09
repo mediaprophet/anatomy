@@ -1,35 +1,27 @@
 # Anatomy
 
-Release package for the Qualia human-welfare body. Synth produces the HMC.
-QualiaDB docs, and a Webizen site that serves those docs, import this package
-and present it with QualiaPortal.
+Three trees. `main` is still the previous viewer. This branch, `release/human-welfare-hmc`, is the replacement. The old viewer is also under `archive/viewer-0.0.8/`.
 
-`main` still has the previous viewer. This branch, `release/human-welfare-hmc`,
-is the replacement. The previous files are on `archive/viewer-0.0.8` and also
-under `archive/viewer-0.0.8/` in this tree.
-
-## Release
-
-| Path | Role |
+| Tree | Role |
 |---|---|
-| `source/human_anatomy.vibe` | VibeScript that calls the human welfare compiler |
-| `release/human-welfare.hmc` | Synth `files/1` package, SHA-256 `b26c952c13a0adb8937c5a8358baf6ab90aa3ddc53b24dbfb9ab0850d56fce47` |
-| `release/export/human/` | The 39 member files (`.10d`, measurements JSON, `.q42`, turnaround, blueprint) |
-| `release/manifest.json` | Profile ids and the keys inside the HMC |
-| `knowledge/` | System map, condition map, and shapes the welfare engine already reads |
+| `master/` | Research and the VibeScript. This is what production has to satisfy |
+| `distribution/` | Shipped member files, plus the `.hmc` that only bags them |
+| `web/` | The page for GitHub Pages |
 
-Mesh members live in the bundle under `outputs/` plus the manifest path. Example: `outputs/human/male.10d`.
+Synth produces the members. `distribution/containers/human-welfare.hmc` is the current container, SHA-256 `b26c952c13a0adb8937c5a8358baf6ab90aa3ddc53b24dbfb9ab0850d56fce47`.
+
+## Pages
+
+`.github/workflows/pages.yml` publishes `web/index.html` together with `distribution/` and `master/` when this branch is pushed, after GitHub Pages is enabled for the repository. Until then, with Pages set to this branch and the repository root, the page is `/web/` and its links use `../distribution` and `../master`.
 
 ## Import into QualiaDB docs
-
-From this directory:
 
 ```powershell
 .\import-into-qualiadb-docs.ps1
 ```
 
-That copies `release/` into `qualiaDB/docs/playground/anatomy-studio/`. The playground host fetches `anatomy-studio/human-welfare.hmc` and passes each `.10d` to QualiaPortal `load_hmc_mesh`. A Webizen host that serves `qualiaDB/docs/` picks up the same files.
+That copies the container and the members into `qualiaDB/docs/playground/anatomy-studio/`. A Webizen host that serves those docs uses the same files. QualiaPortal loads each `.10d` from the container.
 
-## What this package contains
+## Current drop
 
-Adult male, adult female, trimester weeks 10, 22 and 38, and a week-34 body. Male, female, and the three trimester profiles also have skeleton and écorché peels. Measurements and rule containers are the compiler output stored beside each composite body.
+Adult male, adult female, and pregnancy weeks 10, 22, 34, and 38. These are welfare schematics. The atlas those files still have to become is described in `master/research/modelling-requirements.md`.

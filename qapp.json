@@ -50,16 +50,16 @@
     ],
     "max_sensitivity_clearance": "0x00",
     "entrypoints": {
-      "web": "index.html",
-      "representation": "index.html#representation",
-      "chat_component": "index.html#chat-component",
-      "release_hmc": "release/human-welfare.hmc",
-      "release_manifest": "release/manifest.json"
+      "web": "web/index.html",
+      "representation": "web/index.html#representation",
+      "chat_component": "web/index.html#chat-component",
+      "release_hmc": "distribution/containers/human-welfare.hmc",
+      "release_manifest": "distribution/manifest.json"
     },
     "release": {
       "id": "human-welfare",
-      "hmc": "release/human-welfare.hmc",
-      "manifest": "release/manifest.json",
+      "hmc": "distribution/containers/human-welfare.hmc",
+      "manifest": "distribution/manifest.json",
       "sha256": "b26c952c13a0adb8937c5a8358baf6ab90aa3ddc53b24dbfb9ab0850d56fce47",
       "producer": "synth files/1"
     },
@@ -113,11 +113,11 @@
         "fields": ["organ", "opacity", "visible", "placement", "seriesInstanceUID"]
       },
       "knowledge_assets": [
-        "Knowledge/system-map.json",
-        "Knowledge/condition-map.json",
-        "Knowledge/conditions.ttl",
-        "Knowledge/shapes.shacl",
-        "Knowledge/dicom-organ-map.json"
+        "master/knowledge/system-map.json",
+        "master/knowledge/condition-map.json",
+        "master/knowledge/conditions.ttl",
+        "master/knowledge/shapes.shacl",
+        "master/knowledge/dicom-organ-map.json"
       ],
       "supported_system_count": 17
     },
