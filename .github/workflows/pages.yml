@@ -22,6 +22,7 @@ jobs:
         run: |
           mkdir -p _site
           cp web/index.html _site/index.html
+          cp web/demo.html _site/demo.html
           cp -a distribution _site/distribution
           mkdir -p _site/master
           cp -a master/research _site/master/research

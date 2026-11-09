@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Anatomy demo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body { margin: 0; font-family: sans-serif; background: #101816; color: #e7f2ec; }
+    header { padding: 0.8rem 1rem; display: flex; flex-wrap: wrap; gap: 0.6rem; align-items: center; }
+    select, button { background: #1c2b26; color: inherit; border: 1px solid #3d5c52; padding: 0.35rem 0.5rem; }
+    canvas { display: block; width: 100%; height: calc(100vh - 7.5rem); background: #0c1210; touch-action: none; }
+    p { margin: 0 1rem 0.8rem; max-width: 46rem; color: #b7c9c1; }
+    #status { margin-left: auto; }
+  </style>
+</head>
+<body>
+  <header>
+    <strong>Synth-authored parts</strong>
+    <label>Body <select id="body"></select></label>
+    <label>Part <select id="part"></select></label>
+    <label>Age <select id="age"></select></label>
+    <button id="spin" type="button">Spin</button>
+    <span id="status"></span>
+  </header>
+  <p>This page draws a <code>.10d</code> from the published package. Years lived and appearance are separate files Synth already generated. Bone, vessels, and organs follow years lived. Superficial muscle also follows how old the person looks. A new age is another Synth compile, not a slider on this page.</p>
+  <canvas id="view"></canvas>
+  <script>
+    const shared = ["heart","lung_left","lung_right","eye_left","eye_right","brain","spinal_cord","liver","stomach","kidney_left","kidney_right","spleen","pancreas","trachea","thyroid","aorta","bladder","cranium","spine","pelvis","femur_left","femur_right","humerus_left","humerus_right","pectoralis","deltoid_left","deltoid_right","quadriceps_left","quadriceps_right"];
+    const bodies = {
+      male: shared.concat(["prostate","testis_left","testis_right"]),
+      female: shared.concat(["uterus","ovary_left","ovary_right"]),
+      female_trimester_1: ["uterus","fetus","placenta"],
+      female_trimester_2: ["uterus","fetus","placenta"],
+      female_trimester_3: ["uterus","fetus","placenta"]
+    };
+    const ages = [
+      { id: "reference", label: "Reference adult" },
+      { id: "age8", label: "8 years", parts: ["heart"], body: "male" },
+      { id: "age30_look60", label: "30 years, looks 60", parts: ["quadriceps_left"], body: "male" },
+      { id: "age78_look55", label: "78 years, looks 55", parts: ["spine","aorta","quadriceps_left"], body: "male" },
+      { id: "age78_look78", label: "78 years, looks 78", parts: ["quadriceps_left"], body: "male" }
+    ];
+    const bodyEl = document.getElementById("body");
+    const partEl = document.getElementById("part");
+    const ageEl = document.getElementById("age");
+    const statusEl = document.getElementById("status");
+    const canvas = document.getElementById("view");
+    const ctx = canvas.getContext("2d");
+    let mesh = null;
+    let yaw = 0.6;
+    let pitch = 0.3;
+    let spinning = true;
+    let drag = null;
+
+    function fillSelect(el, items) {
+      el.replaceChildren();
+      for (const item of items) {
+        const option = document.createElement("option");
+        option.value = item.value;
+        option.textContent = item.label;
+        el.appendChild(option);
+      }
+    }
+    fillSelect(bodyEl, Object.keys(bodies).map(id => ({ value: id, label: id.replaceAll("_", " ") })));
+    fillSelect(ageEl, ages.map(age => ({ value: age.id, label: age.label })));
+
+    function partsForSelection() {
+      const age = ages.find(item => item.id === ageEl.value);
+      if (age && age.parts) return age.parts;
+      return bodies[bodyEl.value];
+    }
+    function refreshParts() {
+      const current = partEl.value;
+      const parts = partsForSelection();
+      fillSelect(partEl, parts.map(part => ({ value: part, label: part.replaceAll("_", " ") })));
+      if (parts.includes(current)) partEl.value = current;
+    }
+    function fileUrl() {
+      const age = ages.find(item => item.id === ageEl.value);
+      const part = partEl.value;
+      if (age && age.parts) return `distribution/members/authored/${age.body}/${age.id}/${part}.10d`;
+      return `distribution/members/authored/${bodyEl.value}/${part}.10d`;
+    }
+    function parse10d(buffer) {
+      const view = new DataView(buffer);
+      const magic = String.fromCharCode(view.getUint8(0), view.getUint8(1), view.getUint8(2));
+      if (magic !== "10d") throw new Error("Not a .10d file");
+      const table = view.getUint32(56, true);
+      const count = view.getUint32(60, true);
+      let payload = 0;
+      let length = 0;
+      for (let i = 0; i < count; i++) {
+        const row = table + i * 24;
+        if (view.getUint8(row) === 1) {
+          payload = view.getUint32(row + 4, true);
+          length = view.getUint32(row + 8, true);
+          break;
+        }
+      }
+      if (!length) throw new Error("No mesh section");
+      const flags = view.getUint16(payload, true);
+      const vertices = view.getUint32(payload + 4, true);
+      const triangles = view.getUint32(payload + 8, true);
+      const min = [view.getFloat32(payload + 12, true), view.getFloat32(payload + 16, true), view.getFloat32(payload + 20, true)];
+      const max = [view.getFloat32(payload + 24, true), view.getFloat32(payload + 28, true), view.getFloat32(payload + 32, true)];
+      const positions = [];
+      let cursor = payload + 40;
+      for (let i = 0; i < vertices; i++) {
+        const q = [view.getUint16(cursor, true), view.getUint16(cursor + 2, true), view.getUint16(cursor + 4, true)];
+        cursor += 6;
+        positions.push(q.map((value, axis) => min[axis] + (value / 65535) * (max[axis] - min[axis])));
+      }
+      const indexBytes = flags & 1 ? 2 : 4;
+      const indices = [];
+      for (let i = 0; i < triangles * 3; i++) {
+        indices.push(indexBytes === 2 ? view.getUint16(cursor, true) : view.getUint32(cursor, true));
+        cursor += indexBytes;
+      }
+      return { positions, indices, triangles };
+    }
+    function resize() {
+      canvas.width = canvas.clientWidth * devicePixelRatio;
+      canvas.height = canvas.clientHeight * devicePixelRatio;
+    }
+    function draw() {
+      resize();
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      if (!mesh) return;
+      const scale = Math.min(canvas.width, canvas.height) * 1.6;
+      const points = mesh.positions.map(p => {
+        const cy = Math.cos(yaw), sy = Math.sin(yaw);
+        const cx = Math.cos(pitch), sx = Math.sin(pitch);
+        let x = p[0] * cy + p[2] * sy;
+        let z = -p[0] * sy + p[2] * cy;
+        let y = p[1] * cx - z * sx;
+        z = p[1] * sx + z * cx;
+        return [canvas.width / 2 + x * scale, canvas.height / 2 - y * scale, z];
+      });
+      const faces = [];
+      for (let i = 0; i < mesh.indices.length; i += 3) {
+        const a = points[mesh.indices[i]];
+        const b = points[mesh.indices[i + 1]];
+        const c = points[mesh.indices[i + 2]];
+        const ux = b[0] - a[0], uy = b[1] - a[1], uz = b[2] - a[2];
+        const vx = c[0] - a[0], vy = c[1] - a[1], vz = c[2] - a[2];
+        const light = Math.abs(ux * vy - uy * vx);
+        faces.push({ a, b, c, depth: (a[2] + b[2] + c[2]) / 3, light });
+      }
+      faces.sort((left, right) => left.depth - right.depth);
+      for (const face of faces) {
+        const shade = Math.min(220, 70 + face.light * 0.02);
+        ctx.beginPath();
+        ctx.moveTo(face.a[0], face.a[1]);
+        ctx.lineTo(face.b[0], face.b[1]);
+        ctx.lineTo(face.c[0], face.c[1]);
+        ctx.closePath();
+        ctx.fillStyle = `rgb(${shade * 0.85}, ${shade}, ${shade * 0.9})`;
+        ctx.fill();
+      }
+    }
+    async function load() {
+      const url = fileUrl();
+      statusEl.textContent = "Loading";
+      const response = await fetch(url);
+      if (!response.ok) throw new Error(response.status + " " + url);
+      mesh = parse10d(await response.arrayBuffer());
+      statusEl.textContent = mesh.triangles + " triangles";
+      draw();
+    }
+    function frame() {
+      if (spinning) yaw += 0.01;
+      draw();
+      requestAnimationFrame(frame);
+    }
+    bodyEl.onchange = ageEl.onchange = () => { refreshParts(); load().catch(err => { statusEl.textContent = err.message; }); };
+    partEl.onchange = () => load().catch(err => { statusEl.textContent = err.message; });
+    document.getElementById("spin").onclick = () => { spinning = !spinning; };
+    canvas.onpointerdown = event => { drag = { x: event.clientX, y: event.clientY, yaw, pitch }; spinning = false; canvas.setPointerCapture(event.pointerId); };
+    canvas.onpointermove = event => {
+      if (!drag) return;
+      yaw = drag.yaw + (event.clientX - drag.x) * 0.01;
+      pitch = drag.pitch + (event.clientY - drag.y) * 0.01;
+    };
+    canvas.onpointerup = () => { drag = null; };
+    refreshParts();
+    load().catch(err => { statusEl.textContent = err.message; });
+    requestAnimationFrame(frame);
+  </script>
+</body>
+</html>
