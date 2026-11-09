@@ -1,6 +1,6 @@
 {
   "name": "Anatomy",
-  "version": "0.0.8",
+  "version": "0.1.0",
   "required_shapes": [
     "schema:HealthCondition",
     "schema:MedicalRecord",
@@ -52,7 +52,16 @@
     "entrypoints": {
       "web": "index.html",
       "representation": "index.html#representation",
-      "chat_component": "index.html#chat-component"
+      "chat_component": "index.html#chat-component",
+      "release_hmc": "release/human-welfare.hmc",
+      "release_manifest": "release/manifest.json"
+    },
+    "release": {
+      "id": "human-welfare",
+      "hmc": "release/human-welfare.hmc",
+      "manifest": "release/manifest.json",
+      "sha256": "b26c952c13a0adb8937c5a8358baf6ab90aa3ddc53b24dbfb9ab0850d56fce47",
+      "producer": "synth files/1"
     },
     "wasm": {
       "engine_package": "qualia-core-wasm",

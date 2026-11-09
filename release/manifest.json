@@ -1,0 +1,19 @@
+{
+  "schema": "qualia.anatomy.release/v1",
+  "id": "human-welfare",
+  "version": "0.1.0",
+  "producer": "synth files/1",
+  "source": "source/human_anatomy.vibe",
+  "hmc": "human-welfare.hmc",
+  "sha256": "b26c952c13a0adb8937c5a8358baf6ab90aa3ddc53b24dbfb9ab0850d56fce47",
+  "bundle_key_prefix": "outputs/",
+  "presentation": "QualiaPortal WASM load_hmc_mesh, or a native host that reads the same HMC",
+  "profiles": [
+    {"id": "male", "week": 0, "composite": "human/male.10d", "skeleton": "human/male_skeleton.10d", "ecorche": "human/male_ecorche.10d", "measurements": "human/male_measurements.json", "logic": "human/male_logic.q42"},
+    {"id": "female", "week": 0, "composite": "human/female.10d", "skeleton": "human/female_skeleton.10d", "ecorche": "human/female_ecorche.10d", "measurements": "human/female_measurements.json", "logic": "human/female_logic.q42"},
+    {"id": "female_trimester_1", "week": 10, "composite": "human/female_trimester_1.10d", "skeleton": "human/female_trimester_1_skeleton.10d", "ecorche": "human/female_trimester_1_ecorche.10d", "measurements": "human/female_trimester_1_measurements.json", "logic": "human/female_trimester_1_logic.q42"},
+    {"id": "female_trimester_2", "week": 22, "composite": "human/female_trimester_2.10d", "skeleton": "human/female_trimester_2_skeleton.10d", "ecorche": "human/female_trimester_2_ecorche.10d", "measurements": "human/female_trimester_2_measurements.json", "logic": "human/female_trimester_2_logic.q42"},
+    {"id": "female_trimester_3", "week": 38, "composite": "human/female_trimester_3.10d", "skeleton": "human/female_trimester_3_skeleton.10d", "ecorche": "human/female_trimester_3_ecorche.10d", "measurements": "human/female_trimester_3_measurements.json", "logic": "human/female_trimester_3_logic.q42"},
+    {"id": "female_week_34", "week": 34, "composite": "human/female_week_34.10d", "measurements": "human/female_week_34_measurements.json", "logic": "human/female_week_34_logic.q42"}
+  ]
+}

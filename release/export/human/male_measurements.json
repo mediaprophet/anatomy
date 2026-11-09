@@ -1,0 +1,43 @@
+{
+  "schema": "qualia.welfare.human_anatomy_measurements.v1",
+  "profile": "male",
+  "label": "Adult Male (XY · Reference)",
+  "gestational_week": 0,
+  "anthropometrics": {
+    "stature_cm": 178.0,
+    "body_mass_kg": 76.0,
+    "bmi_kg_m2": 24.0,
+    "biacromial_shoulder_cm": 41.5,
+    "biiliac_pelvic_cm": 28.2,
+    "pelvic_inlet_transverse_mm": 118.0,
+    "subpubic_angle_deg": 64.0,
+    "chest_circumference_cm": 99.0,
+    "waist_abdominal_circumference_cm": 83.0,
+    "hip_circumference_cm": 96.5,
+    "lumbar_lordosis_deg": 41.0,
+    "com_anterior_shift_mm": 0.0
+  },
+  "maternal_cardiorespiratory": {
+    "resting_heart_rate_bpm": 68,
+    "cardiac_output_l_min": 5.2,
+    "blood_volume_expansion_pct": 0,
+    "uterine_blood_flow_ml_min": 0,
+    "diaphragmatic_elevation_cm": 0.0
+  },
+  "obstetric_fetal_biometrics": {
+    "symphysis_fundal_height_cm": 0.0,
+    "estimated_fetal_weight_g": 0,
+    "crown_rump_length_mm": 0,
+    "biparietal_diameter_mm": 0,
+    "femur_length_mm": 0,
+    "amniotic_fluid_index_cm": 0.0,
+    "placental_mass_g": 0,
+    "fetal_heart_rate_bpm": 0
+  },
+  "welfare_thresholds_q42": {
+    "max_recommended_lift_kg": 23.0,
+    "max_lumbar_flexion_safe_deg": 55,
+    "systems_covered": 17,
+    "small_llm_hooks": ["respiration_cycle", "maternal_fetal_cardiac", "postural_lordosis_balance", "fetal_movement_kick", "pelvic_rom_guard"]
+  }
+}

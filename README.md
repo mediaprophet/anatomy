@@ -1,108 +1,35 @@
 # Anatomy
 
-Qualia Anatomy is a local-first anatomy visualization app for QualiaDB. It uses
-Human Reference Atlas `.glb` models for the body layer and is intended to become
-the representation surface for health graph reasoning, personal biometrics, and
-chat-driven explanation.
+Release package for the Qualia human-welfare body. Synth produces the HMC.
+QualiaDB docs, and a Webizen site that serves those docs, import this package
+and present it with QualiaPortal.
 
-## What This Directory Now Covers
+`main` still has the previous viewer. This branch, `release/human-welfare-hmc`,
+is the replacement. The previous files are on `archive/viewer-0.0.8` and also
+under `archive/viewer-0.0.8/` in this tree.
 
-This directory is now documented for three deployment targets:
+## Release
 
-1. Online app that can probe for a local Qualia install and adapt if present.
-2. Pure browser/WASM app that still works when no native install exists.
-3. Installed app inside the Qualia Flutter desktop App Vault.
+| Path | Role |
+|---|---|
+| `source/human_anatomy.vibe` | VibeScript that calls the human welfare compiler |
+| `release/human-welfare.hmc` | Synth `files/1` package, SHA-256 `b26c952c13a0adb8937c5a8358baf6ab90aa3ddc53b24dbfb9ab0850d56fce47` |
+| `release/export/human/` | The 39 member files (`.10d`, measurements JSON, `.q42`, turnaround, blueprint) |
+| `release/manifest.json` | Profile ids and the keys inside the HMC |
+| `knowledge/` | System map, condition map, and shapes the welfare engine already reads |
 
-The current repo-backed capability assessment for those modes lives in
-[API_CAPABILITIES_ASSESSMENT.md](C:\Projects\qualiaDB\app-development\Anatomy\API_CAPABILITIES_ASSESSMENT.md).
+Mesh members live in the bundle under `outputs/` plus the manifest path. Example: `outputs/human/male.10d`.
 
-## Current Status
+## Import into QualiaDB docs
 
-### Works today
+From this directory:
 
-- Static Babylon.js anatomy viewer in [index.html](C:\Projects\qualiaDB\app-development\Anatomy\index.html)
-- Local helper scaffold in [qualia.js](C:\Projects\qualiaDB\app-development\Anatomy\qualia.js)
-- Knowledge assets in [Knowledge](C:\Projects\qualiaDB\app-development\Anatomy\Knowledge)
-- Installable App Vault manifest in [app.json](C:\Projects\qualiaDB\app-development\Anatomy\app.json)
-
-### Partially available
-
-- Browser-side WASM use of Qualia engine exports
-- Flutter App Vault install and launch flow
-- Flutter local chat with in-process model inference
-- Qualia daemon health/query surface
-
-### Not complete yet
-
-- Secure app token handoff from App Vault launch to web app
-- Reliable browser-side discovery of the active daemon port
-- Stable JS bridge between Flutter chat and the Anatomy web surface
-- A high-level representation contract for passing graph summaries into anatomy UI
-- A richer manifest schema that the installer/launcher actually enforces
-
-## Deployment Modes
-
-| Mode | Goal | Current reality |
-|---|---|---|
-| Standalone static app | Open the viewer with no Qualia dependency | Works now |
-| Standalone WASM app | Run reasoning/parsing in-browser | Partially works; low-level exports exist, high-level graph session API does not |
-| Online app + local probe | Remote-hosted app checks for local Qualia and upgrades if found | Health check is plausible; authenticated graph access is not complete |
-| Flutter App Vault app | Install, launch, and embed inside Qualia desktop | Install/launch works; daemon/chat wiring still needs follow-up |
-| Chat-driven anatomy component | User chats with local Qualia, then sees anatomy representations | Chat exists; component handoff contract does not yet exist |
-
-## Recommended Product Shape
-
-The strongest path is a layered experience:
-
-1. Baseline mode: static anatomy viewer with local demo knowledge.
-2. WASM mode: add parsing, validation, and lightweight local reasoning with browser-safe exports.
-3. Desktop mode: when launched from Qualia Flutter, receive user context, chat summaries, and local graph-derived representation payloads.
-
-That lets the app remain useful without a daemon, while still becoming much more
-powerful when local Qualia capabilities are present.
-
-## Manifest Direction
-
-The current App Vault only requires:
-
-- `name`
-- `version`
-- `required_shapes`
-- optional `dev_port`
-
-This directory now includes a real [app.json](C:\Projects\qualiaDB\app-development\Anatomy\app.json)
-using those fields, plus an `x_qualia` extension block for forward-looking
-capabilities. The extra fields are for planning and documentation today; they are
-not yet consumed by the current installer/launcher.
-
-## Chat + Representation Direction
-
-The intended interaction model is:
-
-1. User chats with their local Qualia install.
-2. Chat/orchestrator produces a structured representation payload.
-3. Anatomy launches or focuses as a component.
-4. Anatomy renders organs, systems, overlays, and explanatory cards from that payload.
-
-The proposed payload contract and required API work are documented in
-[API_CAPABILITIES_ASSESSMENT.md](C:\Projects\qualiaDB\app-development\Anatomy\API_CAPABILITIES_ASSESSMENT.md).
-
-## Files
-
-```text
-Anatomy/
-|-- API_CAPABILITIES_ASSESSMENT.md
-|-- README.md
-|-- TODO.md
-|-- app.json
-|-- index.html
-|-- qualia.js
-`-- Knowledge/
-    |-- conditions.ttl
-    `-- shapes.shacl
+```powershell
+.\import-into-qualiadb-docs.ps1
 ```
 
-## Immediate Next Work
+That copies `release/` into `qualiaDB/docs/playground/anatomy-studio/`. The playground host fetches `anatomy-studio/human-welfare.hmc` and passes each `.10d` to QualiaPortal `load_hmc_mesh`. A Webizen host that serves `qualiaDB/docs/` picks up the same files.
 
-See [TODO.md](C:\Projects\qualiaDB\app-development\Anatomy\TODO.md) for the task
-list that follows from the current API assessment.
+## What this package contains
+
+Adult male, adult female, trimester weeks 10, 22 and 38, and a week-34 body. Male, female, and the three trimester profiles also have skeleton and écorché peels. Measurements and rule containers are the compiler output stored beside each composite body.
