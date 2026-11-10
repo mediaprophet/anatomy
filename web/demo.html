@@ -8,213 +8,59 @@
     body { margin: 0; font-family: sans-serif; background: #101816; color: #e7f2ec; }
     header { padding: 0.8rem 1rem; display: flex; flex-wrap: wrap; gap: 0.6rem; align-items: center; }
     select, button { background: #1c2b26; color: inherit; border: 1px solid #3d5c52; padding: 0.35rem 0.5rem; }
-    canvas { display: block; width: 100%; height: calc(100vh - 7.5rem); background: #0c1210; touch-action: none; }
-    p { margin: 0 1rem 0.8rem; max-width: 46rem; color: #b7c9c1; }
-    #status { min-width: 12rem; }
+    canvas { display: block; width: 100%; height: calc(100vh - 8.5rem); background: #0c1210; touch-action: none; }
+    p { margin: 0 1rem 0.8rem; max-width: 54rem; color: #b7c9c1; }
+    #status { min-width: 14rem; }
+    #stage { position: relative; }
+    #degraded {
+      margin: 0;
+      display: none;
+      flex-direction: column;
+      align-items: stretch;
+      background: #0c1210;
+      min-height: calc(100vh - 8.5rem);
+    }
+    body.degraded-2d #view { display: none; }
+    body.degraded-2d #degraded { display: flex; }
+    #degraded img {
+      display: block;
+      width: 100%;
+      height: calc(100vh - 11rem);
+      object-fit: contain;
+      background: #0c1210;
+    }
+    #degraded figcaption {
+      margin: 0;
+      padding: 0.55rem 1rem;
+      background: #3a2410;
+      color: #f3d9b0;
+      font-weight: 600;
+      letter-spacing: 0.01em;
+    }
   </style>
 </head>
 <body>
   <header>
     <strong>Synth-authored parts</strong>
+    <label>Lane <select id="lane">
+      <option value="working-master">Working master</option>
+      <option value="working-cad">Working CAD</option>
+      <option value="published">Published</option>
+    </select></label>
     <label>Body <select id="body"></select></label>
     <label>Part <select id="part"></select></label>
     <label>Age <select id="age"></select></label>
     <button id="spin" type="button">Spin</button>
     <span id="status"></span>
   </header>
-  <p>This page draws a <code>.10d</code> from the published package. Years lived and appearance are separate files Synth already generated. Bone, vessels, and organs follow years lived. Superficial muscle also follows how old the person looks. A new age is another Synth compile, not a slider on this page.</p>
-  <canvas id="view"></canvas>
-  <script>
-    const shared = ["heart","lung_left","lung_right","eye_left","eye_right","brain","spinal_cord","liver","stomach","kidney_left","kidney_right","spleen","pancreas","trachea","thyroid","aorta","bladder","cranium","spine","pelvis","femur_left","femur_right","humerus_left","humerus_right","pectoralis","deltoid_left","deltoid_right","quadriceps_left","quadriceps_right"];
-    const bodies = {
-      male: shared.concat(["prostate","testis_left","testis_right"]),
-      female: shared.concat(["uterus","ovary_left","ovary_right"]),
-      female_trimester_1: ["uterus","fetus","placenta"],
-      female_trimester_2: ["uterus","fetus","placenta"],
-      female_trimester_3: ["uterus","fetus","placenta"]
-    };
-    const ages = [
-      { id: "reference", label: "Reference adult" },
-      { id: "age8", label: "8 years", parts: ["heart"], body: "male" },
-      { id: "age30_look60", label: "30 years, looks 60", parts: ["quadriceps_left"], body: "male" },
-      { id: "age78_look55", label: "78 years, looks 55", parts: ["spine","aorta","quadriceps_left"], body: "male" },
-      { id: "age78_look78", label: "78 years, looks 78", parts: ["quadriceps_left"], body: "male" }
-    ];
-    const bodyEl = document.getElementById("body");
-    const partEl = document.getElementById("part");
-    const ageEl = document.getElementById("age");
-    const statusEl = document.getElementById("status");
-    const canvas = document.getElementById("view");
-    const ctx = canvas.getContext("2d");
-    let mesh = null;
-    let yaw = 0.6;
-    let pitch = 0.3;
-    let spinning = true;
-    let drag = null;
-
-    function fillSelect(el, items) {
-      el.replaceChildren();
-      for (const item of items) {
-        const option = document.createElement("option");
-        option.value = item.value;
-        option.textContent = item.label;
-        el.appendChild(option);
-      }
-    }
-    fillSelect(bodyEl, Object.keys(bodies).map(id => ({ value: id, label: id.replaceAll("_", " ") })));
-    fillSelect(ageEl, ages.map(age => ({ value: age.id, label: age.label })));
-
-    function partsForSelection() {
-      const age = ages.find(item => item.id === ageEl.value);
-      if (age && age.parts) return age.parts;
-      return bodies[bodyEl.value];
-    }
-    function refreshParts() {
-      const current = partEl.value;
-      const parts = partsForSelection();
-      fillSelect(partEl, parts.map(part => ({ value: part, label: part.replaceAll("_", " ") })));
-      if (parts.includes(current)) partEl.value = current;
-    }
-    function assetRoot() {
-      return location.pathname.replace(/\\/g, "/").includes("/web/") ? "../" : "";
-    }
-    function fileUrl() {
-      const age = ages.find(item => item.id === ageEl.value);
-      const part = partEl.value;
-      const path = age && age.parts
-        ? `distribution/members/authored/${age.body}/${age.id}/${part}.10d`
-        : `distribution/members/authored/${bodyEl.value}/${part}.10d`;
-      return assetRoot() + path;
-    }
-    function fit(positions) {
-      const min = [Infinity, Infinity, Infinity];
-      const max = [-Infinity, -Infinity, -Infinity];
-      for (const p of positions) {
-        for (let axis = 0; axis < 3; axis++) {
-          min[axis] = Math.min(min[axis], p[axis]);
-          max[axis] = Math.max(max[axis], p[axis]);
-        }
-      }
-      const center = min.map((value, axis) => (value + max[axis]) / 2);
-      const extent = Math.max(max[0] - min[0], max[1] - min[1], max[2] - min[2], 1e-6);
-      return { center, extent };
-    }
-    function parse10d(buffer) {
-      const view = new DataView(buffer);
-      const magic = String.fromCharCode(view.getUint8(0), view.getUint8(1), view.getUint8(2));
-      if (magic !== "10d") throw new Error("Not a .10d file");
-      const table = view.getUint32(56, true);
-      const count = view.getUint32(60, true);
-      let payload = 0;
-      let length = 0;
-      for (let i = 0; i < count; i++) {
-        const row = table + i * 24;
-        if (view.getUint8(row) === 1) {
-          payload = view.getUint32(row + 4, true);
-          length = view.getUint32(row + 8, true);
-          break;
-        }
-      }
-      if (!length) throw new Error("No mesh section");
-      const flags = view.getUint16(payload, true);
-      const vertices = view.getUint32(payload + 4, true);
-      const triangles = view.getUint32(payload + 8, true);
-      const min = [view.getFloat32(payload + 12, true), view.getFloat32(payload + 16, true), view.getFloat32(payload + 20, true)];
-      const max = [view.getFloat32(payload + 24, true), view.getFloat32(payload + 28, true), view.getFloat32(payload + 32, true)];
-      const positions = [];
-      let cursor = payload + 40;
-      for (let i = 0; i < vertices; i++) {
-        const q = [view.getUint16(cursor, true), view.getUint16(cursor + 2, true), view.getUint16(cursor + 4, true)];
-        cursor += 6;
-        positions.push(q.map((value, axis) => min[axis] + (value / 65535) * (max[axis] - min[axis])));
-      }
-      const indexBytes = flags & 1 ? 2 : 4;
-      const indices = [];
-      for (let i = 0; i < triangles * 3; i++) {
-        indices.push(indexBytes === 2 ? view.getUint16(cursor, true) : view.getUint32(cursor, true));
-        cursor += indexBytes;
-      }
-      return { positions, indices, triangles };
-    }
-    function resize() {
-      canvas.width = canvas.clientWidth * devicePixelRatio;
-      canvas.height = canvas.clientHeight * devicePixelRatio;
-    }
-    function draw() {
-      resize();
-      ctx.setTransform(1, 0, 0, 1, 0, 0);
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      if (!mesh) return;
-      const frame = fit(mesh.positions);
-      const scale = Math.min(canvas.width, canvas.height) * 0.72 / frame.extent;
-      const points = mesh.positions.map(p => {
-        const cy = Math.cos(yaw), sy = Math.sin(yaw);
-        const cx = Math.cos(pitch), sx = Math.sin(pitch);
-        const px = p[0] - frame.center[0];
-        const py = p[1] - frame.center[1];
-        const pz = p[2] - frame.center[2];
-        let x = px * cy + pz * sy;
-        let z = -px * sy + pz * cy;
-        let y = py * cx - z * sx;
-        z = py * sx + z * cx;
-        return [canvas.width / 2 + x * scale, canvas.height / 2 - y * scale, z];
-      });
-      const faces = [];
-      for (let i = 0; i < mesh.indices.length; i += 3) {
-        const a = points[mesh.indices[i]];
-        const b = points[mesh.indices[i + 1]];
-        const c = points[mesh.indices[i + 2]];
-        const ux = b[0] - a[0], uy = b[1] - a[1], uz = b[2] - a[2];
-        const vx = c[0] - a[0], vy = c[1] - a[1], vz = c[2] - a[2];
-        const light = Math.abs(ux * vy - uy * vx);
-        faces.push({ a, b, c, depth: (a[2] + b[2] + c[2]) / 3, light });
-      }
-      faces.sort((left, right) => left.depth - right.depth);
-      for (const face of faces) {
-        const shade = Math.min(220, 70 + face.light * 0.02);
-        ctx.beginPath();
-        ctx.moveTo(face.a[0], face.a[1]);
-        ctx.lineTo(face.b[0], face.b[1]);
-        ctx.lineTo(face.c[0], face.c[1]);
-        ctx.closePath();
-        ctx.fillStyle = `rgb(${shade * 0.85}, ${shade}, ${shade * 0.9})`;
-        ctx.fill();
-      }
-    }
-    async function load() {
-      const url = fileUrl();
-      statusEl.textContent = "Loading";
-      const response = await fetch(url);
-      if (!response.ok) throw new Error(response.status + " " + url);
-      mesh = parse10d(await response.arrayBuffer());
-      const size = fit(mesh.positions);
-      statusEl.textContent = mesh.triangles + " triangles · " + Math.round(size.extent * 100) + " cm";
-      draw();
-    }
-    function frame() {
-      if (spinning) yaw += 0.01;
-      draw();
-      requestAnimationFrame(frame);
-    }
-    bodyEl.onchange = ageEl.onchange = () => { refreshParts(); load().catch(err => { statusEl.textContent = err.message; }); };
-    partEl.onchange = () => load().catch(err => { statusEl.textContent = err.message; });
-    document.getElementById("spin").onclick = () => { spinning = !spinning; };
-    canvas.onpointerdown = event => { drag = { x: event.clientX, y: event.clientY, yaw, pitch }; spinning = false; canvas.setPointerCapture(event.pointerId); };
-    canvas.onpointermove = event => {
-      if (!drag) return;
-      yaw = drag.yaw + (event.clientX - drag.x) * 0.01;
-      pitch = drag.pitch + (event.clientY - drag.y) * 0.01;
-    };
-    canvas.onpointerup = () => { drag = null; };
-    const query = new URLSearchParams(location.search);
-    if (query.get("body") && bodies[query.get("body")]) bodyEl.value = query.get("body");
-    if (query.get("age") && ages.some(age => age.id === query.get("age"))) ageEl.value = query.get("age");
-    refreshParts();
-    if (query.get("part") && [...partEl.options].some(option => option.value === query.get("part"))) {
-      partEl.value = query.get("part");
-    }
-    load().catch(err => { statusEl.textContent = err.message; });
-    requestAnimationFrame(frame);
-  </script>
+  <p>QualiaPortal is the official viewer. It loads <code>.10d</code> (SRD1/UV01 mesh) and the sibling <code>.emf</code> (Q42EMF64 field values). RGBA and sonics are conversions of those <code>.emf</code> cells — values are not stored inside the mesh. A 2D canvas or PNG is a degraded fallback only, never the official painter.</p>
+  <div id="stage">
+    <canvas id="view"></canvas>
+    <figure id="degraded">
+      <img id="degraded-preview" alt="Degraded 2D preview">
+      <figcaption>Degraded 2D preview — QualiaPortal GPU unavailable</figcaption>
+    </figure>
+  </div>
+  <script type="module" src="./demo-portal.js"></script>
 </body>
 </html>
