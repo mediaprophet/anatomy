@@ -1,0 +1,267 @@
+@prefix sh:       <http://www.w3.org/ns/shacl#> .
+@prefix rdf:      <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:     <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:      <http://www.w3.org/2001/XMLSchema#> .
+@prefix bio:      <https://qualia.anatomy.example/ontology/bio#> .
+@prefix dens:     <https://qualia.anatomy.example/ontology/dens#> .
+@prefix epistemic: <https://qualia.anatomy.example/ontology/epistemic#> .
+@prefix q42m:     <https://qualia.anatomy.example/ontology/q42m#> .
+
+# =============================================================================
+# Epistemic Densitometry & Universal Biological Structural Kinematic Shapes
+# =============================================================================
+
+# 1. Structural Support Element Shape
+bio:StructuralSupportElementShape a sh:NodeShape ;
+    sh:targetClass bio:StructuralSupportElement ;
+    sh:property [
+        sh:path dens:apparentBoneDensityGPerCm3 ;
+        sh:minInclusive 0.05 ;
+        sh:maxInclusive 3.0 ;
+        sh:datatype xsd:decimal ;
+        sh:message "Apparent bone density must be between 0.05 and 3.0 g/cm^3."
+    ] ;
+    sh:property [
+        sh:path dens:trabecularBoneVolumeFraction ;
+        sh:minInclusive 0.0 ;
+        sh:maxInclusive 1.0 ;
+        sh:datatype xsd:decimal ;
+        sh:message "Trabecular bone volume fraction must be between 0.0 and 1.0."
+    ] ;
+    sh:property [
+        sh:path dens:corticalThicknessMm ;
+        sh:minInclusive 0.0 ;
+        sh:datatype xsd:decimal ;
+        sh:message "Cortical thickness must be greater than or equal to 0.0 mm."
+    ] ;
+    sh:property [
+        sh:path dens:corticalPorosityRatio ;
+        sh:minInclusive 0.0 ;
+        sh:maxInclusive 1.0 ;
+        sh:datatype xsd:decimal ;
+        sh:message "Cortical porosity ratio must be between 0.0 and 1.0."
+    ] ;
+    sh:property [
+        sh:path dens:mineralizationDegreeRatio ;
+        sh:minInclusive 0.0 ;
+        sh:maxInclusive 1.5 ;
+        sh:datatype xsd:decimal ;
+        sh:message "Mineralization degree ratio must be between 0.0 and 1.5."
+    ] ;
+    sh:property [
+        sh:path dens:structuralFactorOfRiskPhi ;
+        sh:minInclusive 0.0 ;
+        sh:datatype xsd:decimal ;
+        sh:message "Structural factor of risk Phi must be >= 0.0."
+    ] ;
+    sh:property [
+        sh:path bio:physealFusionStatus ;
+        sh:datatype xsd:string ;
+        sh:message "Physeal fusion status must be a string."
+    ] .
+
+# 2. Kinematic Articulation Shape (Guardrail #1: Swing-Twist reach cones)
+bio:KinematicArticulationShape a sh:NodeShape ;
+    sh:targetClass bio:KinematicArticulation ;
+    sh:property [
+        sh:path bio:articulatesWith ;
+        sh:minCount 1 ;
+        sh:message "Kinematic articulation must specify at least one articulated target."
+    ] ;
+    sh:property [
+        sh:path bio:hasLoopClosureConstraint ;
+        sh:maxCount 1 ;
+        sh:datatype xsd:boolean ;
+        sh:message "Loop closure constraint must be boolean if present."
+    ] ;
+    sh:property [
+        sh:path bio:hasSwingTwistReachCone ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:message "Guardrail #1 mandatory: Kinematic articulation must declare exactly one Swing-Twist reach cone configuration."
+    ] .
+
+# 3. Actuation Pathway Shape
+bio:ActuationPathwayShape a sh:NodeShape ;
+    sh:targetClass bio:ActuationPathway ;
+    sh:property [
+        sh:path bio:hasOriginLandmark ;
+        sh:minCount 1 ;
+        sh:message "Actuation pathway must declare an origin landmark."
+    ] ;
+    sh:property [
+        sh:path bio:hasInsertionLandmark ;
+        sh:minCount 1 ;
+        sh:message "Actuation pathway must declare an insertion landmark."
+    ] ;
+    sh:property [
+        sh:path dens:musclePcsaCm2 ;
+        sh:minExclusive 0.0 ;
+        sh:datatype xsd:decimal ;
+        sh:message "Muscle physiological cross-sectional area (PCSA) must be > 0.0 cm^2."
+    ] ;
+    sh:property [
+        sh:path dens:muscleRadiodensityHu ;
+        sh:minInclusive -150.0 ;
+        sh:maxInclusive 120.0 ;
+        sh:datatype xsd:decimal ;
+        sh:message "Muscle radiodensity must be between -150.0 and 120.0 HU."
+    ] ;
+    sh:property [
+        sh:path dens:intramuscularFatFraction ;
+        sh:minInclusive 0.0 ;
+        sh:maxInclusive 1.0 ;
+        sh:datatype xsd:decimal ;
+        sh:message "Intramuscular fat fraction must be between 0.0 and 1.0."
+    ] ;
+    sh:property [
+        sh:path dens:effectiveMuscleQualityFactor ;
+        sh:minInclusive 0.0 ;
+        sh:maxInclusive 1.0 ;
+        sh:datatype xsd:decimal ;
+        sh:message "Effective muscle quality factor must be between 0.0 and 1.0."
+    ] .
+
+# 4. Empirical Assertion Shape
+epistemic:EmpiricalAssertionShape a sh:NodeShape ;
+    sh:targetClass epistemic:EmpiricalAssertion ;
+    sh:property [
+        sh:path epistemic:hasEpistemicStatus ;
+        sh:minCount 1 ;
+        sh:in (
+            epistemic:DirectlyObserved
+            epistemic:InferredFromObservation
+            epistemic:ExtractedFromRecord
+            epistemic:LongitudinallyProjected
+            epistemic:StatisticallyCalibrated
+            epistemic:PhylogeneticallyBracketed
+            epistemic:AuthorialIntent
+        ) ;
+        sh:message "Epistemic status must be one of the permitted controlled enumeration values."
+    ] ;
+    sh:property [
+        sh:path epistemic:hasTemporalStabilityClass ;
+        sh:minCount 1 ;
+        sh:in (
+            epistemic:AcutePhysiological
+            epistemic:SubacuteMetabolicGravidAndHealing
+            epistemic:OntogeneticAndSkeletalRemodeling
+            epistemic:SkeletallyMatureInvariant
+        ) ;
+        sh:message "Temporal stability class must be one of the valid stability classes."
+    ] ;
+    sh:property [
+        sh:path epistemic:phenomenonTime ;
+        sh:deactivate true # conditional requirement handled via SHACL SPARQL or shape constraints below
+    ] .
+
+# Conditional constraints for EmpiricalAssertion via SHACL property shapes & rules
+epistemic:DirectlyObservedMandatoriesShape a sh:NodeShape ;
+    sh:target [
+        a sh:SPARQLTarget ;
+        sh:select """
+            SELECT ?this WHERE {
+                ?this epistemic:hasEpistemicStatus ?status .
+                FILTER(?status IN (epistemic:DirectlyObserved, epistemic:InferredFromObservation, epistemic:ExtractedFromRecord))
+            }
+        """
+    ] ;
+    sh:property [
+        sh:path epistemic:phenomenonTime ;
+        sh:minCount 1 ;
+        sh:message "DirectlyObserved, InferredFromObservation, and ExtractedFromRecord assertions require epistemic:phenomenonTime."
+    ] ;
+    sh:property [
+        sh:path epistemic:hasObservationMethod ;
+        sh:minCount 1 ;
+        sh:message "DirectlyObserved, InferredFromObservation, and ExtractedFromRecord assertions require epistemic:hasObservationMethod (q42m:* Observation Method Taxonomy)."
+    ] ;
+    sh:property [
+        sh:path epistemic:hasObserverRole ;
+        sh:minCount 1 ;
+        sh:message "DirectlyObserved, InferredFromObservation, and ExtractedFromRecord assertions require epistemic:hasObserverRole."
+    ] .
+
+epistemic:InferredMandatoriesShape a sh:NodeShape ;
+    sh:target [
+        a sh:SPARQLTarget ;
+        sh:select """
+            SELECT ?this WHERE {
+                ?this epistemic:hasEpistemicStatus epistemic:InferredFromObservation .
+            }
+        """
+    ] ;
+    sh:property [
+        sh:path epistemic:derivedFromObservation ;
+        sh:minCount 1 ;
+        sh:message "InferredFromObservation assertions require epistemic:derivedFromObservation."
+    ] ;
+    sh:property [
+        sh:path epistemic:hasInferenceFormula ;
+        sh:minCount 1 ;
+        sh:message "InferredFromObservation assertions require epistemic:hasInferenceFormula."
+    ] .
+
+epistemic:ExtractedMandatoriesShape a sh:NodeShape ;
+    sh:target [
+        a sh:SPARQLTarget ;
+        sh:select """
+            SELECT ?this WHERE {
+                ?this epistemic:hasEpistemicStatus epistemic:ExtractedFromRecord .
+            }
+        """
+    ] ;
+    sh:property [
+        sh:path epistemic:extractedFromDocument ;
+        sh:minCount 1 ;
+        sh:message "ExtractedFromRecord assertions require epistemic:extractedFromDocument."
+    ] ;
+    sh:property [
+        sh:path epistemic:reportedObservationMethod ;
+        sh:minCount 1 ;
+        sh:message "ExtractedFromRecord assertions require epistemic:reportedObservationMethod."
+    ] .
+
+# 5. Biological Subject Context Shape
+bio:BiologicalSubjectContextShape a sh:NodeShape ;
+    sh:targetClass bio:BiologicalSubjectContext ;
+    sh:property [
+        sh:path bio:chronologicalAgeMonths ;
+        sh:minInclusive 0 ;
+        sh:maxInclusive 1560 ;
+        sh:datatype xsd:integer ;
+        sh:message "Chronological age in months must be between 0 and 1560."
+    ] ;
+    sh:property [
+        sh:path bio:skeletalMaturationBoneAge ;
+        sh:minCount 1 ;
+        sh:message "Biological subject context must specify skeletal maturation / bone age."
+    ] ;
+    sh:property [
+        sh:path bio:chromosomalSubstrateBasis ;
+        sh:minCount 1 ;
+        sh:message "Biological subject context must specify chromosomal substrate basis."
+    ] ;
+    sh:property [
+        sh:path bio:reproductiveContinuumState ;
+        sh:minCount 1 ;
+        sh:message "Biological subject context must specify reproductive continuum state."
+    ] ;
+    sh:property [
+        sh:path bio:dominantSideLaterality ;
+        sh:minCount 1 ;
+        sh:in ( "Left" "Right" "Ambidextrous" "Symmetric" ) ;
+        sh:message "Dominant side laterality must be specified with a valid orientation value."
+    ] ;
+    sh:property [
+        sh:path bio:habitualMechanicalLoadingTier ;
+        sh:minCount 1 ;
+        sh:message "Biological subject context must specify habitual mechanical loading tier."
+    ] ;
+    sh:property [
+        sh:path bio:hydrationTurgorPermill ;
+        sh:minInclusive 0 ;
+        sh:maxInclusive 1000 ;
+        sh:datatype xsd:integer ;
+        sh:message "Hydration turgor permill must be between 0 and 1000."
+    ] .

@@ -8,9 +8,8 @@
 @prefix organ: <https://qualia.anatomy.example/ontology/organ#> .
 
 # =============================================
-# SHACL Shapes for BioStatus Ontology
-# Version: 0.1
-# Validates conditions and their impact relationships
+# SHACL Shapes for BioStatus Ontology & Ecosystem
+# Version: 1.0 (Includes Epistemic Densitometry & Kinematic Shapes)
 # =============================================
 
 # --- Condition Shape ---
@@ -45,7 +44,7 @@ impact:ImpactShape a sh:NodeShape ;
         sh:minCount 1 ;
     ] .
 
-# --- Optional: Severity validation (if used) ---
+# --- Severity Validation ---
 impact:SeverityShape a sh:NodeShape ;
     sh:targetSubjectsOf impact:severity ;
     sh:property [
@@ -55,11 +54,22 @@ impact:SeverityShape a sh:NodeShape ;
     ] .
 
 # =============================================
+# External Shape References (RadLex, DICOM, and Epistemic Densitometry)
+# =============================================
+
+# Reference to RadLex Anatomy SHACL shapes
+# sh:include or graph imports via processor load of shapes/radlex-anatomy.shacl.ttl
+
+# Reference to DICOM Healthcare SHACL shapes
+# sh:include or graph imports via processor load of shapes/dicom-healthcare.shacl.ttl
+
+# Reference to Epistemic Densitometry & Structural Kinematic SHACL shapes
+# sh:include or graph imports via processor load of shapes/epistemic-densitometry.shacl.ttl
+
+# =============================================
 # Notes
 # =============================================
-# These shapes ensure basic data quality for conditions.
-# They can be extended with:
-# - More specific shapes per condition type
-# - Diet and medication interaction constraints
-# - Cardinality rules for combined conditions
-# - Integration with QualiaDB data import pipelines
+# This file serves as the top-level SHACL validation entry point referencing:
+# - radlex-anatomy.shacl.ttl
+# - dicom-healthcare.shacl.ttl
+# - epistemic-densitometry.shacl.ttl

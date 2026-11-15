@@ -1,115 +1,115 @@
 {
-  "version": "1.0.0",
-  "description": "Canonical map between Anatomy UI system labels, ontology IRIs, and bundled HRA organ models.",
+  "version": "1.1.0",
+  "description": "Canonical map between Anatomy UI system labels, ontology IRIs, and encyclopedia CAD members. Replaces HRA ellipsoid labels.",
   "systems": [
     {
       "id": "circulatory",
       "label": "Circulatory (Cardiovascular) System",
       "ontologyIri": "https://qualia.anatomy.example/ontology/organ#CirculatorySystem",
       "legacyIris": ["https://qualia.anatomy.example/ontology/organ#CardiovascularSystem"],
-      "organs": { "common": ["Heart"] }
+      "organs": { "common": ["heart", "aorta", "vena_cava", "pulmonary_trunk"] }
     },
     {
       "id": "respiratory",
       "label": "Respiratory System",
       "ontologyIri": "https://qualia.anatomy.example/ontology/organ#RespiratorySystem",
-      "organs": { "common": ["Lung"] }
+      "organs": { "common": ["lung_left", "lung_right", "trachea", "diaphragm"] }
     },
     {
       "id": "digestive",
       "label": "Digestive System",
       "ontologyIri": "https://qualia.anatomy.example/ontology/organ#DigestiveSystem",
       "legacyIris": ["https://qualia.anatomy.example/ontology/organ#HepatobiliarySystem"],
-      "organs": { "common": ["Liver", "Pancreas", "Small Intestine"] }
+      "organs": { "common": ["liver", "stomach", "esophagus", "pancreas", "gallbladder", "small_intestine", "large_intestine", "tongue"] }
     },
     {
       "id": "nervous",
       "label": "Nervous System",
       "ontologyIri": "https://qualia.anatomy.example/ontology/organ#NervousSystem",
-      "organs": { "common": ["Brain (Allen)"] }
+      "organs": { "common": ["brain", "spinal_cord"] }
     },
     {
       "id": "muscular",
       "label": "Muscular System",
       "ontologyIri": "https://qualia.anatomy.example/ontology/organ#MuscularSystem",
-      "organs": { "common": ["Heart"] }
+      "organs": { "common": ["heart", "diaphragm", "pectoralis", "deltoid_left", "deltoid_right", "quadriceps_left", "quadriceps_right"] }
     },
     {
       "id": "skeletal",
       "label": "Skeletal System",
       "ontologyIri": "https://qualia.anatomy.example/ontology/organ#SkeletalSystem",
-      "organs": { "common": [] }
+      "organs": { "common": ["cranium", "spine", "ribcage", "pelvis", "clavicle_left", "clavicle_right", "scapula_left", "scapula_right", "humerus_left", "humerus_right", "radius_left", "radius_right", "ulna_left", "ulna_right", "femur_left", "femur_right", "tibia_left", "tibia_right", "fibula_left", "fibula_right"] }
     },
     {
       "id": "endocrine",
       "label": "Endocrine System",
       "ontologyIri": "https://qualia.anatomy.example/ontology/organ#EndocrineSystem",
       "legacyIris": ["https://qualia.anatomy.example/ontology/organ#MetabolicSystem"],
-      "organs": { "common": ["Pancreas"] }
+      "organs": { "common": ["pancreas", "thyroid"] }
     },
     {
       "id": "immune_lymphatic",
       "label": "Immune / Lymphatic System",
       "ontologyIri": "https://qualia.anatomy.example/ontology/organ#ImmuneLymphaticSystem",
-      "organs": { "common": ["Spleen"] }
+      "organs": { "common": ["spleen"] }
     },
     {
       "id": "integumentary",
       "label": "Integumentary System",
       "ontologyIri": "https://qualia.anatomy.example/ontology/organ#IntegumentarySystem",
-      "organs": { "common": [] }
+      "organs": { "common": ["skin_torso"] }
     },
     {
       "id": "urinary",
       "label": "Urinary (Excretory) System",
       "ontologyIri": "https://qualia.anatomy.example/ontology/organ#UrinarySystem",
       "legacyIris": ["https://qualia.anatomy.example/ontology/organ#RenalSystem"],
-      "organs": { "common": ["Kidney (Left)", "Kidney (Right)"] }
+      "organs": { "common": ["kidney_left", "kidney_right", "bladder"] }
     },
     {
       "id": "reproductive",
       "label": "Reproductive System",
       "ontologyIri": "https://qualia.anatomy.example/ontology/organ#ReproductiveSystem",
       "organs": {
-        "male": ["Prostate"],
-        "female": ["Uterus", "Ovary (Left)", "Ovary (Right)"]
+        "male": ["prostate", "testis_left", "testis_right"],
+        "female": ["uterus", "ovary_left", "ovary_right", "fetus", "placenta"]
       }
     },
     {
       "id": "sensory",
       "label": "Sensory System",
       "ontologyIri": "https://qualia.anatomy.example/ontology/organ#SensorySystem",
-      "organs": { "common": ["Brain (Allen)"] }
+      "organs": { "common": ["brain", "eye_left", "eye_right", "ear_left", "ear_right", "tongue"] }
     },
     {
       "id": "vestibular",
       "label": "Vestibular System",
       "ontologyIri": "https://qualia.anatomy.example/ontology/organ#VestibularSystem",
-      "organs": { "common": [] }
+      "organs": { "common": ["ear_left", "ear_right"] }
     },
     {
       "id": "exocrine",
       "label": "Exocrine System",
       "ontologyIri": "https://qualia.anatomy.example/ontology/organ#ExocrineSystem",
-      "organs": { "common": ["Liver", "Pancreas"] }
+      "organs": { "common": ["liver", "pancreas", "gallbladder"] }
     },
     {
       "id": "ecs",
       "label": "Endocannabinoid System (ECS)",
       "ontologyIri": "https://qualia.anatomy.example/ontology/organ#EndocannabinoidSystem",
-      "organs": { "common": ["Brain (Allen)", "Spleen"] }
+      "organs": { "common": ["brain", "spleen"] }
     },
     {
       "id": "ens",
       "label": "Enteric Nervous System (ENS)",
       "ontologyIri": "https://qualia.anatomy.example/ontology/organ#EntericNervousSystem",
-      "organs": { "common": ["Small Intestine"] }
+      "organs": { "common": ["small_intestine", "large_intestine"] }
     },
     {
       "id": "glymphatic",
       "label": "Glymphatic System",
       "ontologyIri": "https://qualia.anatomy.example/ontology/organ#GlymphaticSystem",
-      "organs": { "common": ["Brain (Allen)"] }
+      "organs": { "common": ["brain"] }
     }
   ]
 }
